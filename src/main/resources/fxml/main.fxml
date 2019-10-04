@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="322.0" prefWidth="571.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+
+    <children>
+        <TextField fx:id="cmdEdit" layoutX="11.0" layoutY="35.0" prefHeight="25.0" prefWidth="486.0" promptText="command" />
+        <Button fx:id="sendButton" layoutX="506.0" layoutY="35.0" mnemonicParsing="false" text="Send" />
+      <TextArea fx:id="terminalText" layoutX="14.0" layoutY="79.0" prefHeight="200.0" prefWidth="486.0" />
+    </children>
+
+</AnchorPane>
