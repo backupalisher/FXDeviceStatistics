@@ -30,6 +30,7 @@ public class Controller {
     private static int COMPANY_ID = 1;
     private static int ADDRESS_ID = 1;
 
+    String dd; 
     //Open WebSocket
     final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://socket.api.part4.info:8080/"));
 
