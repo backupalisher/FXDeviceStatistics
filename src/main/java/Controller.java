@@ -41,6 +41,7 @@ public class Controller implements Initializable {
     private static String SERIAL_NUMBER;
     private static String DEVICE_NAME;
 
+    String dd; 
     //Open WebSocket
     final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://socket.api.part4.info:8080/"));
 
