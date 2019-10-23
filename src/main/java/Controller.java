@@ -39,6 +39,7 @@ public class Controller implements Initializable {
     private static int COMPANY_ID = 1;
     private static int ADDRESS_ID = 1;
     private static String SERIAL_NUMBER;
+    private static String DEVICE_NAME;
 
     //Open WebSocket
     final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://socket.api.part4.info:8080/"));
@@ -77,6 +78,8 @@ public class Controller implements Initializable {
 //                                    clientEndPoint.sendMessage(parserL2700(subStr[1]));
 //                                    break;
                                 case "Kyocera ECOSYS M2030dn":
+                                    DEVICE_NAME = subStr[0];
+                                    SERIAL_NUMBER = subStr[2];
                                     clientEndPoint.sendMessage(parserM2030(subStr[1]));
                                     break;
                             }
@@ -271,7 +274,8 @@ public class Controller implements Initializable {
         JSONObject obj = new JSONObject();
         //{"init_client_error": 1, "url": "https://192.168.1.233", "error": "Нет связи с устройством, по адресу: https://192.168.1.233"}
         obj.put("init_client_error", USER_ID);
-        obj.put("sn",SERIAL_NUMBER);
+        obj.put("serialNumber",SERIAL_NUMBER);
+        obj.put("productName",DEVICE_NAME);
         obj.put("error", "Нет связи с устройством, по адресу: " + url);
         jsonMessage = obj.toString();
         System.out.println(jsonMessage);

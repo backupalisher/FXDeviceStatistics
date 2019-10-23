@@ -1,0 +1,2 @@
+public class GetPageHttps {
+}
