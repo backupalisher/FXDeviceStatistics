@@ -1,3 +1,5 @@
+package info.part4.Utils;
+
 import javax.websocket.*;
 import java.net.URI;
 

@@ -1,3 +1,5 @@
+package info.part4;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
