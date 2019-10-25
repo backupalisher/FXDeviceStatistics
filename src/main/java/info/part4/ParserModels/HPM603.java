@@ -18,7 +18,7 @@ public class HPM603 {
         String jsonMessage = null;
         Document page;
 
-//        if (pingHost(url, 80, 2000)) {
+//
         GetPageHttps getPageHttps = new GetPageHttps();
         page = getPageHttps.getPage(url);
 

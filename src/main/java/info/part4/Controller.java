@@ -1,17 +1,23 @@
 package info.part4;
 
 import info.part4.ParserModels.KyoceraM2540;
+import info.part4.Utils.PingHost;
 import info.part4.Utils.WebsocketClientEndpoint;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.*;
 import java.net.*;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
+    public static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
     public static int USER_ID = 2;
     public static int COMPANY_ID = 1;
     public static int ADDRESS_ID = 1;
@@ -19,7 +25,7 @@ public class Controller implements Initializable {
     public static String DEVICE_NAME;
 
     //Open WebSocket
-    final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://socket.api.part4.info:8080/"));
+    final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL_CLIENT_ENDPOINT));
 
     @FXML
     private TextArea terminalText;
@@ -35,36 +41,59 @@ public class Controller implements Initializable {
         //SocketListener;
         clientEndPoint.addMessageHandler(message -> {
             terminalText.appendText(LocalDateTime.now() + ": " + message + "\r\n");
-            if (message.contains("getDevices")) {
-                if (message.contains("2")) {
-                    try {
-                        FileInputStream fileInputStream = new FileInputStream("c:\\1\\devicelist");
-                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-                        String strLine;
-                        String[] subStr;
-                        while ((strLine = bufferedReader.readLine()) != null) {
-                            subStr = strLine.split(";");
-                            switch (subStr[0]) {
-//                                    case "HP LaserJet 600 M603":
-//                                        clientEndPoint.sendMessage(parseM603(subStr[1]));
-//                                        break;
-//                                    case "HP LaserJet 500 MFP M525":
-//                                        clientEndPoint.sendMessage(parseM525(subStr[1]));
-//                                        break;
-//                                case "Brother MFC-L2700DN":
-//                                    clientEndPoint.sendMessage(parserL2700(subStr[1]));
-//                                    break;
-                                case "Kyocera ECOSYS M2540dn":
-                                    DEVICE_NAME = subStr[0];
-                                    SERIAL_NUMBER = subStr[2];
-                                    KyoceraM2540 kyoceraM2540 = new KyoceraM2540();
-                                    clientEndPoint.sendMessage(kyoceraM2540.parser(subStr[1]));
-                                    break;
-                            }
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(message);
+            String server_init = (String) jsonObject.get("server_init");
+            String init_client = (String) jsonObject.get("init_client");
+
+//            System.out.println(message);
+            System.out.println(server_init);
+
+            if (server_init.contains("getInfo")) {
+                if (init_client.contains("1")) {
+
+                    JSONArray devices = (JSONArray) jsonObject.get("devices");
+
+                    System.out.println(devices);
+                    Iterator i = devices.iterator();
+                    // берем каждое значение из массива json отдельно
+                    while (i.hasNext()) {
+                        JSONObject device = (JSONObject) i.next();
+                        String productName = (String) device.get("productName");
+                        String device_url = (String) device.get("url");
+                        String serialNumber = (String) device.get("serialNumber");
+                        String device_id = (String) device.get("device_id");
+                        System.out.println(device);
+                        PingHost pingHost = new PingHost();
+                        System.out.println(device_url);
+                        System.out.println(pingHost.ping(device_url,80,1000));
+//                        Class.forName(productName);
                     }
+
+//                        FileInputStream fileInputStream = new FileInputStream("c:\\1\\devicelist");
+//                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+//                        String strLine;
+//                        String[] subStr;
+//                        while ((strLine = bufferedReader.readLine()) != null) {
+//                            subStr = strLine.split(";");
+//                            switch (subStr[0]) {
+////                                    case "HP LaserJet 600 M603":
+////                                        clientEndPoint.sendMessage(parseM603(subStr[1]));
+////                                        break;
+////                                    case "HP LaserJet 500 MFP M525":
+////                                        clientEndPoint.sendMessage(parseM525(subStr[1]));
+////                                        break;
+////                                case "Brother MFC-L2700DN":
+////                                    clientEndPoint.sendMessage(parserL2700(subStr[1]));
+////                                    break;
+//                                case "Kyocera ECOSYS M2540dn":
+//                                    DEVICE_NAME = subStr[0];
+//                                    SERIAL_NUMBER = subStr[2];
+//                                    KyoceraM2540 kyoceraM2540 = new KyoceraM2540();
+//                                    clientEndPoint.sendMessage(kyoceraM2540.parser(subStr[1]));
+//                                    break;
+//                            }
+//                        }
                 }
             }
         });
@@ -77,7 +106,6 @@ public class Controller implements Initializable {
 //        String url = BASE_PATH;
 //        Document page;
 //
-//        if (pingHost(BASE_PATH, 80, 2000)) {
 //
 //            page = getPage(url);
 //

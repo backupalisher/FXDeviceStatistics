@@ -1,5 +1,8 @@
 package info.part4.Utils;
 
+import info.part4.Controller;
+import org.json.simple.parser.ParseException;
+
 import javax.websocket.*;
 import java.net.URI;
 
@@ -36,9 +39,11 @@ public class WebsocketClientEndpoint {
      * @param reason the reason for connection close
      */
     @OnClose
-    public void onClose(Session userSession, CloseReason reason) {
+    public void onClose(Session userSession, CloseReason reason) throws InterruptedException {
         System.out.println("closing websocket");
         this.userSession = null;
+//        Thread.sleep(1000);
+//        onOpen(new URI(Controller.URL_CLIENT_ENDPOINT));
     }
 
     /**
@@ -47,7 +52,7 @@ public class WebsocketClientEndpoint {
      * @param message The text message
      */
     @OnMessage
-    public void onMessage(String message) {
+    public void onMessage(String message) throws ParseException, ClassNotFoundException {
         if (this.messageHandler != null) {
             this.messageHandler.handleMessage(message);
         }
@@ -78,6 +83,6 @@ public class WebsocketClientEndpoint {
      */
     public static interface MessageHandler {
 
-        public void handleMessage(String message);
+        public void handleMessage(String message) throws ParseException, ClassNotFoundException;
     }
 }

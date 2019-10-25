@@ -11,11 +11,18 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class example {
-    private static final String filePath = "C:\\Temp\\json.json";
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws ClassNotFoundException {
+        Class.forName("info.part4.parserTest");
+    }
+}
+
+class parserTest {
+    static  {
+        final String filePath = "C:\\1\\json.json";
+        // считывание файла JSON
         try {
-            // считывание файла JSON
             FileReader reader = new FileReader(filePath);
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
@@ -39,9 +46,9 @@ public class example {
             // берем каждое значение из массива json отдельно
             while (i.hasNext()) {
                 JSONObject innerObj = (JSONObject) i.next();
-                System.out.println(innerObj.get("lang") +
-                        " " + innerObj.get("knowledge"));
+                System.out.println(innerObj.get("lang") + ": " + innerObj.get("knowledge"));
             }
+
             // обрабатываем структуру в объекте
             JSONObject structure = (JSONObject) jsonObject.get("job");
             System.out.println("Into job structure, name: " + structure.get("name"));
@@ -52,8 +59,5 @@ public class example {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
-
 }
