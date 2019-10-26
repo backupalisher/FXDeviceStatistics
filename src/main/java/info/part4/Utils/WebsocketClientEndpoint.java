@@ -53,9 +53,23 @@ public class WebsocketClientEndpoint {
      * @param message The text message
      */
     @OnMessage
-    public void onMessage(String message) throws ParseException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void onMessage(String message) {
         if (this.messageHandler != null) {
-            this.messageHandler.handleMessage(message);
+            try {
+                this.messageHandler.handleMessage(message);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 

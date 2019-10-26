@@ -70,17 +70,18 @@ public class Controller implements Initializable {
 
                         PingHost pingHost = new PingHost();
                         device_url = getIP(device_url);
+                        boolean device_online;
+                        device_online = pingHost.ping(device_url, 80, 2000);
 
-                        if (pingHost.ping(device_url, 80, 1000)) {
+                        if (device_online) {
                             String name = productName.replaceAll("\\s+", "");
                             System.out.println(name);
-                            Class<?> c = Class.forName("info.part4.ParserModels" + name);
+                            Class<?> c = Class.forName("info.part4.ParserModels." + name);
                             Class[] params = {String.class};
 
-                            Method method = c.getDeclaredMethod("ping", params);
+                            Method method = c.getDeclaredMethod("parser", params);
                             method.setAccessible(true);
                             Object[] objects = new Object[]{new String(device_url)};
-
                             String b = (String) method.invoke(c.newInstance(), objects);
 
                             System.out.println(b);
