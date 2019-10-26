@@ -64,7 +64,7 @@ public class HPM525 {
             }
         } else {
             NotConnectedJson notConnectedJson = new NotConnectedJson();
-            return notConnectedJson.errorJson(url);
+//            return notConnectedJson.errorJson(url);
         }
         return jsonMessage;
     }

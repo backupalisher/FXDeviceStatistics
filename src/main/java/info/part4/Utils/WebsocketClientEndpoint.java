@@ -4,6 +4,7 @@ import info.part4.Controller;
 import org.json.simple.parser.ParseException;
 
 import javax.websocket.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 @ClientEndpoint
@@ -52,7 +53,7 @@ public class WebsocketClientEndpoint {
      * @param message The text message
      */
     @OnMessage
-    public void onMessage(String message) throws ParseException, ClassNotFoundException {
+    public void onMessage(String message) throws ParseException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if (this.messageHandler != null) {
             this.messageHandler.handleMessage(message);
         }
@@ -83,6 +84,6 @@ public class WebsocketClientEndpoint {
      */
     public static interface MessageHandler {
 
-        public void handleMessage(String message) throws ParseException, ClassNotFoundException;
+        public void handleMessage(String message) throws ParseException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException;
     }
 }

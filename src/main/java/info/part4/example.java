@@ -8,56 +8,25 @@ import org.json.simple.parser.ParseException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 
 public class example {
 
+    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+//        Class<?> c = Class.forName("info.part4.Utils.PingHost");
+////        Class obj = c.getClass();
+//        Class[] params = {String.class, int.class, int.class};
+//
+//        Method method = c.getDeclaredMethod("ping", params);
+//        method.setAccessible(true);
+//        Object[] objects = new Object[] {new String("192.168.1.24"), new Integer(80),new Integer(100) };
+//
+//        boolean b = (boolean) method.invoke(c.newInstance(), objects);
+//
+//        System.out.println(b);
 
-    public static void main(String[] args) throws ClassNotFoundException {
-        Class.forName("info.part4.parserTest");
-    }
-}
 
-class parserTest {
-    static  {
-        final String filePath = "C:\\1\\json.json";
-        // считывание файла JSON
-        try {
-            FileReader reader = new FileReader(filePath);
-            JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
-
-            // получение строки из объекта
-            String firstName = (String) jsonObject.get("firstname");
-            System.out.println(firstName);
-
-            // получение номера из объекта
-            long id = (long) jsonObject.get("id");
-            System.out.println(id);
-
-            // получение массива
-            JSONArray lang = (JSONArray) jsonObject.get("languages");
-
-            // берем элементы массива
-            for (int i = 0; i < lang.size(); i++) {
-                System.out.println(lang.get(i));
-            }
-            Iterator i = lang.iterator();
-            // берем каждое значение из массива json отдельно
-            while (i.hasNext()) {
-                JSONObject innerObj = (JSONObject) i.next();
-                System.out.println(innerObj.get("lang") + ": " + innerObj.get("knowledge"));
-            }
-
-            // обрабатываем структуру в объекте
-            JSONObject structure = (JSONObject) jsonObject.get("job");
-            System.out.println("Into job structure, name: " + structure.get("name"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

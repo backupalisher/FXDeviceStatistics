@@ -1,6 +1,7 @@
 package info.part4;
 
 import info.part4.ParserModels.KyoceraM2540;
+import info.part4.Utils.NotConnectedJson;
 import info.part4.Utils.PingHost;
 import info.part4.Utils.WebsocketClientEndpoint;
 import javafx.fxml.FXML;
@@ -11,18 +12,23 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.ResourceBundle;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Controller implements Initializable {
-    public static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
+    private static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
     public static int USER_ID = 2;
     public static int COMPANY_ID = 1;
     public static int ADDRESS_ID = 1;
     public static String SERIAL_NUMBER;
     public static String DEVICE_NAME;
+    public static int DEVICE_ID;
 
     //Open WebSocket
     final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL_CLIENT_ENDPOINT));
@@ -42,32 +48,47 @@ public class Controller implements Initializable {
         clientEndPoint.addMessageHandler(message -> {
             terminalText.appendText(LocalDateTime.now() + ": " + message + "\r\n");
             JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(message);
-            String server_init = (String) jsonObject.get("server_init");
-            String init_client = (String) jsonObject.get("init_client");
+            JSONObject statusObject = (JSONObject) jsonParser.parse(message);
+            JSONObject jsonObject = (JSONObject) statusObject.get("status");
 
-//            System.out.println(message);
-            System.out.println(server_init);
+            String server_init = jsonObject.get("server_init").toString();
+            int init_client = Integer.parseInt(jsonObject.get("init_client").toString());
 
             if (server_init.contains("getInfo")) {
-                if (init_client.contains("1")) {
+                if (init_client == 1) {
 
                     JSONArray devices = (JSONArray) jsonObject.get("devices");
 
-                    System.out.println(devices);
                     Iterator i = devices.iterator();
                     // берем каждое значение из массива json отдельно
                     while (i.hasNext()) {
                         JSONObject device = (JSONObject) i.next();
-                        String productName = (String) device.get("productName");
-                        String device_url = (String) device.get("url");
-                        String serialNumber = (String) device.get("serialNumber");
-                        String device_id = (String) device.get("device_id");
-                        System.out.println(device);
+                        String productName = device.get("productName").toString();
+                        String device_url = device.get("url").toString();
+                        String serialNumber = device.get("serialNumber").toString();
+                        int device_id = Integer.parseInt(device.get("device_id").toString());
+
                         PingHost pingHost = new PingHost();
-                        System.out.println(device_url);
-                        System.out.println(pingHost.ping(device_url,80,1000));
-//                        Class.forName(productName);
+                        device_url = getIP(device_url);
+
+                        if (pingHost.ping(device_url, 80, 1000)) {
+                            String name = productName.replaceAll("\\s+", "");
+                            System.out.println(name);
+                            Class<?> c = Class.forName("info.part4.ParserModels" + name);
+                            Class[] params = {String.class};
+
+                            Method method = c.getDeclaredMethod("ping", params);
+                            method.setAccessible(true);
+                            Object[] objects = new Object[]{new String(device_url)};
+
+                            String b = (String) method.invoke(c.newInstance(), objects);
+
+                            System.out.println(b);
+                        } else {
+                            NotConnectedJson notConnectedJson = new NotConnectedJson();
+                            notConnectedJson.errorJson(init_client, device_id, device_url);
+                        }
+
                     }
 
 //                        FileInputStream fileInputStream = new FileInputStream("c:\\1\\devicelist");
@@ -99,6 +120,16 @@ public class Controller implements Initializable {
         });
     }
 
+    private String getIP(String... lines) {
+        String ip = null;
+        Pattern p = Pattern.compile("(\\d{0,3}\\.){3}\\d{0,3}");
+        for (String s : lines) {
+            Matcher m = p.matcher(s);
+            if (m.find())
+                ip = m.group();
+        }
+        return ip;
+    }
 
 //    private static String getBrand() throws KeyManagementException, NoSuchAlgorithmException {
 //        String jsonMessage = null;

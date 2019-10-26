@@ -39,9 +39,9 @@ public class KyoceraM2540 {
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            NotConnectedJson notConnectedJson = new NotConnectedJson();
-            return notConnectedJson.errorJson(url);
-//            e.printStackTrace();
+//            NotConnectedJson notConnectedJson = new NotConnectedJson();
+//            return notConnectedJson.errorJson(url);
+            e.printStackTrace();
         }
 
         String[] subStr;

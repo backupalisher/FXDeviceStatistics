@@ -12,7 +12,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-public class HPM603 {
+public class HPLaserJet500MFPM525 {
     //HP LaserJet 600 M603
     private static String parserM603(String url) throws KeyManagementException, NoSuchAlgorithmException {
         String jsonMessage = null;
@@ -66,7 +66,7 @@ public class HPM603 {
             }
         } else {
             NotConnectedJson notConnectedJson = new NotConnectedJson();
-            return notConnectedJson.errorJson(url);
+//            return notConnectedJson.errorJson(url);
         }
         return jsonMessage;
     }
