@@ -1,6 +1,5 @@
 package info.part4;
 
-import info.part4.ParserModels.KyoceraM2540;
 import info.part4.Utils.NotConnectedJson;
 import info.part4.Utils.PingHost;
 import info.part4.Utils.WebsocketClientEndpoint;
@@ -11,27 +10,22 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.*;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Controller implements Initializable {
     private static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
-    public static int USER_ID = 2;
+    public static int USER_ID = 1;
     public static int COMPANY_ID = 1;
     public static int ADDRESS_ID = 1;
-    public static String SERIAL_NUMBER;
-    public static String DEVICE_NAME;
-    public static int DEVICE_ID;
 
     //Open WebSocket
-    final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL_CLIENT_ENDPOINT));
+    private final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL_CLIENT_ENDPOINT));
 
     @FXML
     private TextArea terminalText;
@@ -47,6 +41,7 @@ public class Controller implements Initializable {
         //SocketListener;
         clientEndPoint.addMessageHandler(message -> {
             terminalText.appendText(LocalDateTime.now() + ": " + message + "\r\n");
+            System.out.println(message);
             JSONParser jsonParser = new JSONParser();
             JSONObject statusObject = (JSONObject) jsonParser.parse(message);
             JSONObject jsonObject = (JSONObject) statusObject.get("status");
@@ -55,8 +50,7 @@ public class Controller implements Initializable {
             int init_client = Integer.parseInt(jsonObject.get("init_client").toString());
 
             if (server_init.contains("getInfo")) {
-                if (init_client == 1) {
-
+                if (init_client == USER_ID) {
                     JSONArray devices = (JSONArray) jsonObject.get("devices");
 
                     Iterator i = devices.iterator();
@@ -69,53 +63,26 @@ public class Controller implements Initializable {
                         int device_id = Integer.parseInt(device.get("device_id").toString());
 
                         PingHost pingHost = new PingHost();
-                        device_url = getIP(device_url);
                         boolean device_online;
-                        device_online = pingHost.ping(device_url, 80, 2000);
+                        device_online = pingHost.ping(getIP(device_url), 80, 2000);
 
                         if (device_online) {
                             String name = productName.replaceAll("\\s+", "");
-                            System.out.println(name);
-                            Class<?> c = Class.forName("info.part4.ParserModels." + name);
+                            Class<?> clazz = Class.forName("info.part4.ParserModels." + name);
                             Class[] params = {String.class};
 
-                            Method method = c.getDeclaredMethod("parser", params);
+                            Method method = clazz.getDeclaredMethod("parser", params);
                             method.setAccessible(true);
-                            Object[] objects = new Object[]{new String(device_url)};
-                            String b = (String) method.invoke(c.newInstance(), objects);
-
-                            System.out.println(b);
+                            Object[] objects = new Object[]{device_url};
+                            String jsonMessage = (String) method.invoke(clazz.newInstance(), objects);
+                            Thread.sleep(50);
+                            clientEndPoint.sendMessage(jsonMessage);
                         } else {
+                            Thread.sleep(50);
                             NotConnectedJson notConnectedJson = new NotConnectedJson();
-                            notConnectedJson.errorJson(init_client, device_id, device_url);
+                            clientEndPoint.sendMessage(notConnectedJson.errorJson(init_client, device_id, device_url));
                         }
-
                     }
-
-//                        FileInputStream fileInputStream = new FileInputStream("c:\\1\\devicelist");
-//                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-//                        String strLine;
-//                        String[] subStr;
-//                        while ((strLine = bufferedReader.readLine()) != null) {
-//                            subStr = strLine.split(";");
-//                            switch (subStr[0]) {
-////                                    case "HP LaserJet 600 M603":
-////                                        clientEndPoint.sendMessage(parseM603(subStr[1]));
-////                                        break;
-////                                    case "HP LaserJet 500 MFP M525":
-////                                        clientEndPoint.sendMessage(parseM525(subStr[1]));
-////                                        break;
-////                                case "Brother MFC-L2700DN":
-////                                    clientEndPoint.sendMessage(parserL2700(subStr[1]));
-////                                    break;
-//                                case "Kyocera ECOSYS M2540dn":
-//                                    DEVICE_NAME = subStr[0];
-//                                    SERIAL_NUMBER = subStr[2];
-//                                    KyoceraM2540 kyoceraM2540 = new KyoceraM2540();
-//                                    clientEndPoint.sendMessage(kyoceraM2540.parser(subStr[1]));
-//                                    break;
-//                            }
-//                        }
                 }
             }
         });

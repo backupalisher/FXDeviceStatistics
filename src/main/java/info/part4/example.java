@@ -13,20 +13,16 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 
 public class example {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        Class<?> c = Class.forName("info.part4.Utils.PingHost");
+        Class[] params = {String.class, int.class, int.class};
 
-    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-//        Class<?> c = Class.forName("info.part4.Utils.PingHost");
-////        Class obj = c.getClass();
-//        Class[] params = {String.class, int.class, int.class};
-//
-//        Method method = c.getDeclaredMethod("ping", params);
-//        method.setAccessible(true);
-//        Object[] objects = new Object[] {new String("192.168.1.24"), new Integer(80),new Integer(100) };
-//
-//        boolean b = (boolean) method.invoke(c.newInstance(), objects);
-//
-//        System.out.println(b);
+        Method method = c.getDeclaredMethod("ping", params);
+        method.setAccessible(true);
+        Object[] objects = new Object[] {new String("192.168.1.233"), new Integer(80),new Integer(100) };
 
+        boolean b = (boolean) method.invoke(c.newInstance(), objects);
 
+        System.out.println(b);
     }
 }

@@ -63,9 +63,10 @@ public class HPLaserJet500MFPM525 {
                 e.printStackTrace();
             }
         } else {
-            NotConnectedJson notConnectedJson = new NotConnectedJson();
+//            NotConnectedJson notConnectedJson = new NotConnectedJson();
 //            return notConnectedJson.errorJson(url);
         }
+        System.out.println(jsonMessage);
         return jsonMessage;
     }
 }

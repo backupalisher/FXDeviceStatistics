@@ -69,6 +69,8 @@ public class WebsocketClientEndpoint {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -98,6 +100,6 @@ public class WebsocketClientEndpoint {
      */
     public static interface MessageHandler {
 
-        public void handleMessage(String message) throws ParseException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException;
+        public void handleMessage(String message) throws ParseException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException, InterruptedException;
     }
 }
