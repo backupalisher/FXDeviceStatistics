@@ -1,6 +1,5 @@
 package info.part4.Utils;
 
-import info.part4.Controller;
 import org.json.simple.parser.ParseException;
 
 import javax.websocket.*;
@@ -9,8 +8,10 @@ import java.net.URI;
 
 @ClientEndpoint
 public class WebsocketClientEndpoint {
-    Session userSession = null;
+    private Session userSession = null;
     private MessageHandler messageHandler;
+
+    public String SESSION_STATUS;
 
 
     public WebsocketClientEndpoint(URI endpointURI) {
@@ -31,18 +32,18 @@ public class WebsocketClientEndpoint {
     public void onOpen(Session userSession) {
         System.out.println("opening websocket");
         this.userSession = userSession;
+        SESSION_STATUS = "OPEN";
     }
 
     /**
      * Callback hook for Connection close events.
      *
-     * @param userSession the userSession which is getting closed.
-     * @param reason the reason for connection close
      */
     @OnClose
-    public void onClose(Session userSession, CloseReason reason) throws InterruptedException {
+    public void onClose() {
         System.out.println("closing websocket");
         this.userSession = null;
+        SESSION_STATUS = "CLOSE";
 //        Thread.sleep(1000);
 //        onOpen(new URI(Controller.URL_CLIENT_ENDPOINT));
     }
@@ -57,19 +58,8 @@ public class WebsocketClientEndpoint {
         if (this.messageHandler != null) {
             try {
                 this.messageHandler.handleMessage(message);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (ParseException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                    InstantiationException | InterruptedException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
@@ -98,8 +88,7 @@ public class WebsocketClientEndpoint {
      *
      * @author Jiji_Sasidharan
      */
-    public static interface MessageHandler {
-
-        public void handleMessage(String message) throws ParseException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException, InterruptedException;
+    public interface MessageHandler {
+        void handleMessage(String message) throws ParseException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException, InterruptedException;
     }
 }

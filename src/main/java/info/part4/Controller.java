@@ -1,5 +1,6 @@
 package info.part4;
 
+import info.part4.Utils.ListenerWebsocketSessionStatus;
 import info.part4.Utils.NotConnectedJson;
 import info.part4.Utils.PingHost;
 import info.part4.Utils.WebsocketClientEndpoint;
@@ -15,17 +16,20 @@ import java.net.*;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.ResourceBundle;
+import java.util.Timer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Controller implements Initializable {
-    private static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
+    public static final String HOST_URL = "socket.api.part4.info";
+    public static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
     public static int USER_ID = 1;
     public static int COMPANY_ID = 1;
     public static int ADDRESS_ID = 1;
 
     //Open WebSocket
     private final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL_CLIENT_ENDPOINT));
+
 
     @FXML
     private TextArea terminalText;
@@ -37,7 +41,7 @@ public class Controller implements Initializable {
     public Controller() throws URISyntaxException {
     }
 
-    public void SocketListener() {
+    private void SocketListener() {
         //SocketListener;
         clientEndPoint.addMessageHandler(message -> {
             terminalText.appendText(LocalDateTime.now() + ": " + message + "\r\n");
@@ -187,7 +191,16 @@ public class Controller implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+//        ListenerWebsocketSessionStatus listenerWebsocketSessionStatus = new ListenerWebsocketSessionStatus();
+//        Timer timer = new Timer(true);
+//        // будем запускать каждых 10 секунд (10 * 1000 миллисекунд)
+//        timer.scheduleAtFixedRate(listenerWebsocketSessionStatus, 0, 10 * 1000);
+
+//        PingHost pingHost = new PingHost();
+//        if (pingHost.ping(HOST_URL, 8080, 100)) {
         SocketListener();
+//        }
+
         sendButton.setOnAction(event -> clientEndPoint.sendMessage(cmdEdit.getText()));
     }
 }

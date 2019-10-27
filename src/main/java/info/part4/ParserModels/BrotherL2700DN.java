@@ -65,8 +65,8 @@ public class BrotherL2700DN {
                 }
             }
             jsonMessage = obj.toString();
-        } else {
-            NotConnectedJson notConnectedJson = new NotConnectedJson();
+//        } else {
+//            NotConnectedJson notConnectedJson = new NotConnectedJson();
 //            return notConnectedJson.errorJson(url);
         }
         System.out.println(jsonMessage);

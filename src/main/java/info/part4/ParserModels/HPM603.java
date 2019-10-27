@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class HPM603 {
     //HP LaserJet 600 M603
-    private static String parserM603(String url) throws KeyManagementException, NoSuchAlgorithmException {
+    private static String parser(String url) throws KeyManagementException, NoSuchAlgorithmException {
         String jsonMessage = null;
         Document page;
 
@@ -52,20 +52,20 @@ public class HPM603 {
                 arr = new JSONArray(new ArrayList<String>());
                 arr_obj.put("maintenanceKitCount", maintenanceKitCount.text());
                 arr.put(arr_obj);
-                obj.put("KIT", (Object) arr);
+                obj.put("KIT", arr);
 
                 arr_obj = new JSONObject();
                 arr = new JSONArray(new ArrayList<String>());
                 arr_obj.put("black", cartridge.text());
                 arr.put(arr_obj);
-                obj.put("cartridge", (Object) arr);
+                obj.put("cartridge", arr);
 
                 jsonMessage = obj.toString();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            NotConnectedJson notConnectedJson = new NotConnectedJson();
+//        } else {
+//            NotConnectedJson notConnectedJson = new NotConnectedJson();
 //            return notConnectedJson.errorJson(url);
         }
         return jsonMessage;

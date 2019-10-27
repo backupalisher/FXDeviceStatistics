@@ -2,28 +2,23 @@ package info.part4;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class Main extends Application {
     private static final String iconImageLoc =
@@ -136,7 +131,7 @@ public class Main extends Application {
 
             // if the user selects the default menu item (which includes the app name),
             // show the main app stage.
-            java.awt.MenuItem openItem = new java.awt.MenuItem("Open");
+            java.awt.MenuItem openItem = new java.awt.MenuItem("Открыть");
             openItem.addActionListener(event -> Platform.runLater(this::showStage));
 
             // the convention for tray icons seems to be to set the default icon for opening
@@ -148,7 +143,7 @@ public class Main extends Application {
             // to really exit the application, the user must go to the system tray icon
             // and select the exit option, this will shutdown JavaFX and remove the
             // tray icon (removing the tray icon will also shut down AWT).
-            java.awt.MenuItem exitItem = new java.awt.MenuItem("Exit");
+            java.awt.MenuItem exitItem = new java.awt.MenuItem("Выход");
             exitItem.addActionListener(event -> {
                 notificationTimer.cancel();
                 Platform.exit();
