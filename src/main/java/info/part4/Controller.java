@@ -11,6 +11,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import javax.websocket.ClientEndpoint;
+import javax.websocket.CloseReason;
+import javax.websocket.OnClose;
+import javax.websocket.Session;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.time.LocalDateTime;
@@ -20,16 +24,14 @@ import java.util.Timer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@ClientEndpoint
 public class Controller implements Initializable {
     public static final String HOST_URL = "socket.api.part4.info";
     public static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
     public static int USER_ID = 1;
     public static int COMPANY_ID = 1;
     public static int ADDRESS_ID = 1;
-
-    //Open WebSocket
-    private final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(URL_CLIENT_ENDPOINT));
-
+    public static WebsocketClientEndpoint WEBSOCKET;
 
     @FXML
     private TextArea terminalText;
@@ -38,53 +40,79 @@ public class Controller implements Initializable {
     @FXML
     private Button sendButton;
 
-    public Controller() throws URISyntaxException {
+    public Controller() {
+    }
+
+    //Open WebSocket
+    public static WebsocketClientEndpoint initClientEnd (String url) throws URISyntaxException {
+        WEBSOCKET = null;
+        return new WebsocketClientEndpoint(new URI(url));
+    }
+
+    @FXML
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        ListenerWebsocketSessionStatus listenerWebsocketSessionStatus = new ListenerWebsocketSessionStatus();
+        Timer timer = new Timer(true);
+        // будем запускать каждых 10 секунд (10 * 1000 миллисекунд)
+        timer.scheduleAtFixedRate(listenerWebsocketSessionStatus, 5000, 5 * 1000);
+
+        try {
+            WEBSOCKET = initClientEnd(URL_CLIENT_ENDPOINT);
+            SocketListener();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        sendButton.setOnAction(event -> WEBSOCKET.sendMessage(cmdEdit.getText()));
     }
 
     private void SocketListener() {
         //SocketListener;
-        clientEndPoint.addMessageHandler(message -> {
+        WEBSOCKET.addMessageHandler(message -> {
             terminalText.appendText(LocalDateTime.now() + ": " + message + "\r\n");
             System.out.println(message);
-            JSONParser jsonParser = new JSONParser();
-            JSONObject statusObject = (JSONObject) jsonParser.parse(message);
-            JSONObject jsonObject = (JSONObject) statusObject.get("status");
+            if (message.contains("getInfo")) {
+                JSONParser jsonParser = new JSONParser();
+                JSONObject statusObject = (JSONObject) jsonParser.parse(message);
+                JSONObject jsonObject = (JSONObject) statusObject.get("status");
 
-            String server_init = jsonObject.get("server_init").toString();
-            int init_client = Integer.parseInt(jsonObject.get("init_client").toString());
+                String server_init = jsonObject.get("server_init").toString();
+                int init_client = Integer.parseInt(jsonObject.get("init_client").toString());
 
-            if (server_init.contains("getInfo")) {
-                if (init_client == USER_ID) {
-                    JSONArray devices = (JSONArray) jsonObject.get("devices");
+                if (server_init.contains("getInfo")) {
+                    if (init_client == USER_ID) {
+                        JSONArray devices = (JSONArray) jsonObject.get("devices");
 
-                    Iterator i = devices.iterator();
-                    // берем каждое значение из массива json отдельно
-                    while (i.hasNext()) {
-                        JSONObject device = (JSONObject) i.next();
-                        String productName = device.get("productName").toString();
-                        String device_url = device.get("url").toString();
-                        String serialNumber = device.get("serialNumber").toString();
-                        int device_id = Integer.parseInt(device.get("device_id").toString());
+                        Iterator i = devices.iterator();
+                        // берем каждое значение из массива json отдельно
+                        while (i.hasNext()) {
+                            JSONObject device = (JSONObject) i.next();
+                            String productName = device.get("productName").toString();
+                            String device_url = device.get("url").toString();
+                            String serialNumber = device.get("serialNumber").toString();
+                            int device_id = Integer.parseInt(device.get("device_id").toString());
 
-                        PingHost pingHost = new PingHost();
-                        boolean device_online;
-                        device_online = pingHost.ping(getIP(device_url), 80, 2000);
+                            PingHost pingHost = new PingHost();
+                            boolean device_online;
+                            device_online = pingHost.ping(getIP(device_url), 80, 2000);
 
-                        if (device_online) {
-                            String name = productName.replaceAll("\\s+", "");
-                            Class<?> clazz = Class.forName("info.part4.ParserModels." + name);
-                            Class[] params = {String.class};
+                            if (device_online) {
+                                String name = productName.replaceAll("\\s+", "");
+                                Class<?> clazz = Class.forName("info.part4.ParserModels." + name);
+                                Class[] params = {String.class};
 
-                            Method method = clazz.getDeclaredMethod("parser", params);
-                            method.setAccessible(true);
-                            Object[] objects = new Object[]{device_url};
-                            String jsonMessage = (String) method.invoke(clazz.newInstance(), objects);
-                            Thread.sleep(50);
-                            clientEndPoint.sendMessage(jsonMessage);
-                        } else {
-                            Thread.sleep(50);
-                            NotConnectedJson notConnectedJson = new NotConnectedJson();
-                            clientEndPoint.sendMessage(notConnectedJson.errorJson(init_client, device_id, device_url));
+                                Method method = clazz.getDeclaredMethod("parser", params);
+                                method.setAccessible(true);
+                                Object[] objects = new Object[]{device_url};
+                                String jsonMessage = (String) method.invoke(clazz.newInstance(), objects);
+                                Thread.sleep(50);
+                                WEBSOCKET.sendMessage(jsonMessage);
+                            } else {
+                                Thread.sleep(50);
+                                NotConnectedJson notConnectedJson = new NotConnectedJson();
+                                WEBSOCKET.sendMessage(notConnectedJson.errorJson(init_client, device_id, device_url));
+                            }
                         }
                     }
                 }
@@ -187,20 +215,4 @@ public class Controller implements Initializable {
 //        } else jsonMessage = "Нет связи с устройством, по адрусу: " + BASE_PATH;
 //        return jsonMessage;
 //    }
-
-    @FXML
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-//        ListenerWebsocketSessionStatus listenerWebsocketSessionStatus = new ListenerWebsocketSessionStatus();
-//        Timer timer = new Timer(true);
-//        // будем запускать каждых 10 секунд (10 * 1000 миллисекунд)
-//        timer.scheduleAtFixedRate(listenerWebsocketSessionStatus, 0, 10 * 1000);
-
-//        PingHost pingHost = new PingHost();
-//        if (pingHost.ping(HOST_URL, 8080, 100)) {
-        SocketListener();
-//        }
-
-        sendButton.setOnAction(event -> clientEndPoint.sendMessage(cmdEdit.getText()));
-    }
 }

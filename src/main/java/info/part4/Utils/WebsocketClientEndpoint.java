@@ -8,10 +8,10 @@ import java.net.URI;
 
 @ClientEndpoint
 public class WebsocketClientEndpoint {
-    private Session userSession = null;
+    private Session userSession;
     private MessageHandler messageHandler;
 
-    public String SESSION_STATUS;
+    static String SESSION_STATUS;
 
 
     public WebsocketClientEndpoint(URI endpointURI) {
@@ -23,6 +23,9 @@ public class WebsocketClientEndpoint {
         }
     }
 
+    private static void uSession(String s){
+        SESSION_STATUS = s;
+    }
     /**
      * Callback hook for Connection open events.
      *
@@ -32,7 +35,8 @@ public class WebsocketClientEndpoint {
     public void onOpen(Session userSession) {
         System.out.println("opening websocket");
         this.userSession = userSession;
-        SESSION_STATUS = "OPEN";
+        uSession("open");
+
     }
 
     /**
@@ -43,7 +47,7 @@ public class WebsocketClientEndpoint {
     public void onClose() {
         System.out.println("closing websocket");
         this.userSession = null;
-        SESSION_STATUS = "CLOSE";
+        uSession("close");
 //        Thread.sleep(1000);
 //        onOpen(new URI(Controller.URL_CLIENT_ENDPOINT));
     }
