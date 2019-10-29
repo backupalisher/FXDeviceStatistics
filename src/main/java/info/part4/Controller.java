@@ -1,6 +1,5 @@
 package info.part4;
 
-import info.part4.Utils.ListenerWebsocketSessionStatus;
 import info.part4.Utils.NotConnectedJson;
 import info.part4.Utils.PingHost;
 import info.part4.Utils.WebsocketClientEndpoint;
@@ -12,21 +11,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.OnClose;
-import javax.websocket.Session;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.ResourceBundle;
-import java.util.Timer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @ClientEndpoint
 public class Controller implements Initializable {
-    public static final String HOST_URL = "socket.api.part4.info";
     public static String URL_CLIENT_ENDPOINT = "ws://socket.api.part4.info:8080/";
     public static int USER_ID = 1;
     public static int COMPANY_ID = 1;
@@ -52,10 +46,10 @@ public class Controller implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ListenerWebsocketSessionStatus listenerWebsocketSessionStatus = new ListenerWebsocketSessionStatus();
-        Timer timer = new Timer(true);
-        // будем запускать каждых 10 секунд (10 * 1000 миллисекунд)
-        timer.scheduleAtFixedRate(listenerWebsocketSessionStatus, 5000, 5 * 1000);
+//        ListenerWebsocketSessionStatus listenerWebsocketSessionStatus = new ListenerWebsocketSessionStatus();
+//        Timer timer = new Timer(true);
+//        // будем запускать каждых 10 секунд (10 * 1000 миллисекунд)
+//        timer.scheduleAtFixedRate(listenerWebsocketSessionStatus, 5000, 5 * 1000);
 
         try {
             WEBSOCKET = initClientEnd(URL_CLIENT_ENDPOINT);

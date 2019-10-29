@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class KyoceraM2540 {
+public class KyoceraECOSYSM2540 {
     //Kyocera ECOSYS M2030dn
     public String parser(String url) {
         String body = null;

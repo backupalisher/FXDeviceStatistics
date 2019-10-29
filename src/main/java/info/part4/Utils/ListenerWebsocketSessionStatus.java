@@ -1,17 +1,7 @@
 package info.part4.Utils;
 
 import info.part4.Controller;
-import info.part4.Main;
-import info.part4.example;
-
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.OnClose;
-import javax.websocket.Session;
-import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.TimerTask;
 
 public class ListenerWebsocketSessionStatus extends TimerTask {

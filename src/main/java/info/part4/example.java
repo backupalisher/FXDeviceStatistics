@@ -1,26 +1,11 @@
 package info.part4;
 
-import com.sun.security.ntlm.Client;
-import info.part4.Utils.ListenerWebsocketSessionStatus;
 import info.part4.Utils.WebsocketClientEndpoint;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import javax.websocket.*;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Iterator;
 import java.util.Scanner;
-import java.util.Timer;
-
-import static info.part4.Controller.URL_CLIENT_ENDPOINT;
 
 @ClientEndpoint
 public class example {
@@ -46,14 +31,14 @@ public class example {
 
     //Open WebSocket
     public static void initClientEnd() {
-        WebSocketContainer container;
-
-        container = ContainerProvider.getWebSocketContainer();
-        try {
-            Session session = container.connectToServer(Client.class, URI.create(Controller.URL_CLIENT_ENDPOINT));
-        } catch (DeploymentException | IOException e) {
-            e.printStackTrace();
-        }
+//        WebSocketContainer container;
+//
+//        container = ContainerProvider.getWebSocketContainer();
+//        try {
+//            Session session = container.connectToServer(Client.class, URI.create(Controller.URL_CLIENT_ENDPOINT));
+//        } catch (DeploymentException | IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @OnOpen
