@@ -25,9 +25,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class Controller implements Initializable {
-    public static int USER_ID = 1;
-    public static int COMPANY_ID = 1;
-    public static int ADDRESS_ID = 1;
+    public static int USER_ID = 2;
+    public static int COMPANY_ID = 2;
+    public static int ADDRESS_ID = 2;
 
     @FXML
     private TextArea terminalText;
