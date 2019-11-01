@@ -1,10 +1,11 @@
 package info.part4.Utils;
 
 import info.part4.Controller;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class NotConnectedJson {
-    public String errorJson(int user_id, int device_id, String url) {
+    public String errorJson(int user_id, int device_id, String url) throws JSONException {
         String jsonMessage;
         JSONObject obj = new JSONObject();
         //{"init_client_error": 1, "serialNumber":"VCG7428977", "productName":"Kyocera ECOSYS M2540dn",

@@ -3,6 +3,7 @@ package info.part4.ParserModels;
 import info.part4.Utils.GetPageHttps;
 import info.part4.Utils.NotConnectedJson;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 public class BrotherL2700DN {
     //Brother MFC-L2700DN
-    public String parser(String url) throws KeyManagementException, NoSuchAlgorithmException, IOException {
+    public String parser(String url) throws KeyManagementException, NoSuchAlgorithmException, IOException, JSONException {
         String jsonMessage = null;
         Document page;
 

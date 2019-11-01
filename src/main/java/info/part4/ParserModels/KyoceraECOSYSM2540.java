@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 
 public class KyoceraECOSYSM2540 {
     //Kyocera ECOSYS M2030dn
-    public String parser(String url) {
+    public String parser(String url) throws JSONException {
         String body = null;
         try {
             HttpClient client = new DefaultHttpClient();
