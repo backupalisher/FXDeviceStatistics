@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class KyoceraECOSYSM2540 {
-    //Kyocera ECOSYS M2030dn
+    //Kyocera ECOSYS M2540dn
     public String parser(String url) throws JSONException {
         String body = null;
         try {

@@ -25,6 +25,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class Controller implements Initializable {
+    static final String URL_CLIENT_ENDPOINT = "http://socket.api.part4.info:3000";
     public static int USER_ID = 2;
     public static int COMPANY_ID = 2;
     public static int ADDRESS_ID = 2;
@@ -49,7 +50,7 @@ public class Controller implements Initializable {
 
         final Socket socket;
         try {
-            String URL_CLIENT_ENDPOINT = "http://socket.api.part4.info:3000";
+
             socket = IO.socket(URL_CLIENT_ENDPOINT, opts);
             socket.on(Socket.EVENT_CONNECT, args -> {
                 socket.emit("message", "Connect, user id: " + USER_ID);
