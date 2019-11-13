@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
 info.part4.Main-Class: info.part4.Main
+Notify-Update: true
+Allow-Ignore-Update: true
 

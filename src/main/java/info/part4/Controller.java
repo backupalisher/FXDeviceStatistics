@@ -1,6 +1,7 @@
 package info.part4;
 
 
+import info.part4.Utils.LoadSettings;
 import info.part4.Utils.NotConnectedJson;
 import info.part4.Utils.PingHost;
 import javafx.fxml.FXML;
@@ -25,8 +26,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class Controller implements Initializable {
-    static final String URL_CLIENT_ENDPOINT = "http://socket.api.part4.info:3000";
-    public static int OFFICE_ID = 3;
+    public static String URL_CLIENT_ENDPOINT = "http://socket.api.part4.info:3000";
+    public static int USER_ID = 3;
     public static int COMPANY_ID = 26;
 //    public static int ADDRESS_ID = 3;
 
@@ -44,6 +45,10 @@ public class Controller implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        LoadSettings loadSettings = new LoadSettings();
+        loadSettings.settings();
+
         IO.Options opts = new IO.Options();
         opts.forceNew = true;
         opts.reconnection = true;
@@ -53,7 +58,7 @@ public class Controller implements Initializable {
 
             socket = IO.socket(URL_CLIENT_ENDPOINT, opts);
             socket.on(Socket.EVENT_CONNECT, args -> {
-                socket.emit("message", "Connect, user id: " + OFFICE_ID);
+                socket.emit("message", "Connect, user id: " + USER_ID);
 //                System.out.println(args[0]);
 //                JSONObject object = new JSONObject();
 //                try {
@@ -65,7 +70,7 @@ public class Controller implements Initializable {
 //                }
             }).on("message", objects -> {
                 System.out.println(objects[0]);
-                terminalText.appendText(objects[0].toString()+"\r\n");
+                terminalText.appendText(objects[0].toString() + "\r\n");
             }).on(Socket.EVENT_MESSAGE, args -> {
                 System.out.println("Message Received: ");
                 for (Object arg : args) {
@@ -81,18 +86,18 @@ public class Controller implements Initializable {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        JSONObject jsonObject = (JSONObject) statusObject.get("status");
-                        System.out.println(jsonObject);
+//                        JSONObject jsonObject = (JSONObject) statusObject.get("status");
+//                        System.out.println(jsonObject);
 
+                        JSONObject jsonObject = statusObject;
                         String server_init = jsonObject.get("server_init").toString();
-                        int init_client = Integer.parseInt(jsonObject.get("init_client").toString());
+                        int companyId = Integer.parseInt(jsonObject.get("companyId").toString());
 
-                        System.out.println(init_client + " = " + OFFICE_ID);
+                        System.out.println(companyId + " = " + COMPANY_ID);
 
-                        if (server_init.contains("getInfo")) {
-                            if (init_client == OFFICE_ID) {
+                        if (server_init.contains("getDevices")) {
+                            if ((companyId == COMPANY_ID) || (companyId == 0)) {
                                 JSONArray devices = (JSONArray) jsonObject.get("devices");
-                                System.out.println("get office_id:" + OFFICE_ID);
 
                                 Iterator j = devices.iterator();
                                 // берем каждое значение из массива json отдельно
@@ -127,7 +132,7 @@ public class Controller implements Initializable {
                                     } else {
                                         NotConnectedJson notConnectedJson = new NotConnectedJson();
                                         try {
-                                            socket.emit("message", notConnectedJson.errorJson(init_client, device_id, device_url));
+                                            socket.emit("message", notConnectedJson.errorJson(COMPANY_ID, device_id));
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -137,6 +142,11 @@ public class Controller implements Initializable {
                         }
                     }
                 }
+                //Send command message
+                sendButton.setOnAction(event -> {
+                    socket.emit("message", cmdEdit.getText());
+                    cmdEdit.setText("");
+                });
             }).on(Socket.EVENT_DISCONNECT, args -> System.out.println("Client disconnected")).on(Socket.EVENT_CONNECT_ERROR, args -> {
                 Exception e = (Exception) args[0];
                 e.printStackTrace();
@@ -154,7 +164,6 @@ public class Controller implements Initializable {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        sendButton.setOnAction(event -> cmdEdit.setText(""));
     }
 
     private String getIP(String... lines) {

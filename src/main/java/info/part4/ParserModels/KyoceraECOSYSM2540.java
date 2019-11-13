@@ -51,13 +51,14 @@ public class KyoceraECOSYSM2540 {
 
         JSONObject obj = new JSONObject();
         JSONArray arr;
-        JSONObject arr_obj = null;
+        JSONObject arr_obj;
 
-        obj.put("init_client", Controller.OFFICE_ID);
-        obj.put("new",1);//1 - это новый, если 0 то это старый
+        obj.put("client_init", "putDevices");
+        obj.put("company_id", Controller.COMPANY_ID);
+//        obj.put("new",1);//1 - это новый, если 0 то это старый
         obj.put("url", url);
         obj.put("article", "0");
-        obj.put("client_article", "0");
+//        obj.put("client_article", "0");
 
         subStr = body.split(";");
         for (int i = 1; i < subStr.length; i++) {
@@ -96,7 +97,7 @@ public class KyoceraECOSYSM2540 {
                     arr = new JSONArray(new ArrayList<String>());
                     arr_obj.put("black", subStr[i].replaceAll(",10", "").replaceAll("[^0-9\\\\+]", ""));
                     arr.put(arr_obj);
-                    obj.put("cartridge", (Object) arr);
+                    obj.put("cartridge", arr);
                 }
             }
         }
