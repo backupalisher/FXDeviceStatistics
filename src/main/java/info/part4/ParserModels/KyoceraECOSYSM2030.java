@@ -52,7 +52,7 @@ public class KyoceraECOSYSM2030 {
         JSONArray arr;
         JSONObject arr_obj = null;
 
-        obj.put("init_client", Controller.USER_ID);
+        obj.put("init_client", Controller.OFFICE_ID);
         obj.put("new",1);//1 - это новый, если 0 то это старый
         obj.put("url", url);
         obj.put("article", "0");

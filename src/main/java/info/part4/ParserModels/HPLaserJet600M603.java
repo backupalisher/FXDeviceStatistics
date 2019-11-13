@@ -37,9 +37,9 @@ public class HPLaserJet600M603 {
             JSONArray arr;
             JSONObject arr_obj;
             try {
-                obj.put("init_client", Controller.USER_ID);
+                obj.put("init_client", Controller.OFFICE_ID);
                 obj.put("company_id", Controller.COMPANY_ID);
-                obj.put("address_id", Controller.ADDRESS_ID);
+//                obj.put("address_id", Controller.ADDRESS_ID);
                 obj.put("productName", productName.text());
                 obj.put("url", url);
                 obj.put("serialNumber", serialNumber.text());

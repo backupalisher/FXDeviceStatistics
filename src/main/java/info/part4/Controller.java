@@ -26,9 +26,9 @@ import org.json.simple.parser.ParseException;
 
 public class Controller implements Initializable {
     static final String URL_CLIENT_ENDPOINT = "http://socket.api.part4.info:3000";
-    public static int USER_ID = 2;
-    public static int COMPANY_ID = 2;
-    public static int ADDRESS_ID = 2;
+    public static int OFFICE_ID = 3;
+    public static int COMPANY_ID = 26;
+//    public static int ADDRESS_ID = 3;
 
     @FXML
     private TextArea terminalText;
@@ -53,7 +53,7 @@ public class Controller implements Initializable {
 
             socket = IO.socket(URL_CLIENT_ENDPOINT, opts);
             socket.on(Socket.EVENT_CONNECT, args -> {
-                socket.emit("message", "Connect, user id: " + USER_ID);
+                socket.emit("message", "Connect, user id: " + OFFICE_ID);
 //                System.out.println(args[0]);
 //                JSONObject object = new JSONObject();
 //                try {
@@ -63,7 +63,7 @@ public class Controller implements Initializable {
 //                } catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
-            }).on("chat message", objects -> {
+            }).on("message", objects -> {
                 System.out.println(objects[0]);
                 terminalText.appendText(objects[0].toString()+"\r\n");
             }).on(Socket.EVENT_MESSAGE, args -> {
@@ -82,13 +82,17 @@ public class Controller implements Initializable {
                             e.printStackTrace();
                         }
                         JSONObject jsonObject = (JSONObject) statusObject.get("status");
+                        System.out.println(jsonObject);
 
                         String server_init = jsonObject.get("server_init").toString();
                         int init_client = Integer.parseInt(jsonObject.get("init_client").toString());
 
+                        System.out.println(init_client + " = " + OFFICE_ID);
+
                         if (server_init.contains("getInfo")) {
-                            if (init_client == USER_ID) {
+                            if (init_client == OFFICE_ID) {
                                 JSONArray devices = (JSONArray) jsonObject.get("devices");
+                                System.out.println("get office_id:" + OFFICE_ID);
 
                                 Iterator j = devices.iterator();
                                 // берем каждое значение из массива json отдельно
@@ -97,11 +101,12 @@ public class Controller implements Initializable {
                                     String productName = device.get("productName").toString();
                                     String device_url = device.get("url").toString();
                                     int device_id = Integer.parseInt(device.get("device_id").toString());
+                                    System.out.println(productName);
 
                                     PingHost pingHost = new PingHost();
                                     boolean device_online;
                                     device_online = pingHost.ping(getIP(device_url), 80, 2000);
-
+                                    System.out.println(device_online);
                                     if (device_online) {
                                         String name = productName.replaceAll("\\s+", "");
                                         try {
