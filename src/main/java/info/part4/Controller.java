@@ -29,6 +29,7 @@ public class Controller implements Initializable {
     public static String URL_CLIENT_ENDPOINT = "http://socket.api.part4.info:3000";
     public static int USER_ID = 3;
     public static int COMPANY_ID = 26;
+    public static int DEVICE_ID = 0;
 //    public static int ADDRESS_ID = 3;
 
     @FXML
@@ -74,11 +75,8 @@ public class Controller implements Initializable {
             }).on(Socket.EVENT_MESSAGE, args -> {
                 System.out.println("Message Received: ");
                 for (Object arg : args) {
-                    System.out.println(arg);
-                    terminalText.appendText(arg.toString() + "\r\n");
-                    String message = (String) args[0];
+                    String message = (String) arg;
                     if (message.contains("status")) {
-
                         JSONParser jsonParser = new JSONParser();
                         JSONObject statusObject = null;
                         try {
@@ -88,62 +86,52 @@ public class Controller implements Initializable {
                         }
                         JSONObject jsonObject = (JSONObject) statusObject.get("status");
 
-//                        JSONParser jsonParser = new JSONParser();
-//                        JSONObject statusObject = null;
-//                        try {
-//                            statusObject = (JSONObject) jsonParser.parse(message);
-//                        } catch (ParseException e) {
-//                            e.printStackTrace();
-//                        }
-//                        JSONObject jsonObject = (JSONObject) statusObject.get("status");
                         System.out.println(jsonObject);
+                        if (jsonObject.toJSONString().contains("result")) {
+                            System.out.println(jsonObject.get("result").toString());
+                        } else {
+                            String server_init = jsonObject.get("server_init").toString();
+                            int company_id = Integer.parseInt(jsonObject.get("company_id").toString());
 
-//                        JSONObject jsonObject = statusObject;
-                        String server_init = jsonObject.get("server_init").toString();
-                        int company_id = Integer.parseInt(jsonObject.get("company_id").toString());
+                            if (server_init.contains("getDevices")) {
+                                if ((company_id == COMPANY_ID) || (company_id == 0)) {
+                                    JSONArray devices = (JSONArray) jsonObject.get("devices");
 
-                        System.out.println(company_id + " = " + COMPANY_ID);
+                                    Iterator j = devices.iterator();
+                                    // берем каждое значение из массива json отдельно
+                                    while (j.hasNext()) {
+                                        JSONObject device = (JSONObject) j.next();
+                                        String productName = device.get("productName").toString();
+                                        String device_url = device.get("url").toString();
+                                        DEVICE_ID = Integer.parseInt(device.get("device_id").toString());
 
-                        if (server_init.contains("getDevices")) {
-                            if ((company_id == COMPANY_ID) || (company_id == 0)) {
-                                JSONArray devices = (JSONArray) jsonObject.get("devices");
+                                        PingHost pingHost = new PingHost();
+                                        boolean device_online;
+                                        device_online = pingHost.ping(getIP(device_url), 80, 2000);
+                                        if (device_online) {
+                                            String name = productName.replaceAll("\\s+", "");
+                                            try {
+                                                Class<?> clazz = Class.forName("info.part4.ParserModels." + name);
+                                                Class[] params = {String.class};
 
-                                Iterator j = devices.iterator();
-                                // берем каждое значение из массива json отдельно
-                                while (j.hasNext()) {
-                                    JSONObject device = (JSONObject) j.next();
-                                    String productName = device.get("productName").toString();
-                                    String device_url = device.get("url").toString();
-                                    int device_id = Integer.parseInt(device.get("device_id").toString());
-                                    System.out.println(productName);
+                                                Method method = clazz.getDeclaredMethod("parser", params);
+                                                method.setAccessible(true);
+                                                Object[] objectsJson = new Object[]{device_url};
+                                                String jsonMessage = (String) method.invoke(clazz.newInstance(), objectsJson);
+                                                socket.emit("message", jsonMessage);
+                                                terminalText.appendText(jsonMessage + "\r\n");
+                                                System.out.println(jsonMessage);
 
-                                    PingHost pingHost = new PingHost();
-                                    boolean device_online;
-                                    device_online = pingHost.ping(getIP(device_url), 80, 2000);
-                                    System.out.println(device_online);
-                                    if (device_online) {
-                                        String name = productName.replaceAll("\\s+", "");
-                                        try {
-                                            Class<?> clazz = Class.forName("info.part4.ParserModels." + name);
-                                            Class[] params = {String.class};
-
-                                            Method method = clazz.getDeclaredMethod("parser", params);
-                                            method.setAccessible(true);
-                                            Object[] objectsJson = new Object[]{device_url};
-                                            String jsonMessage = (String) method.invoke(clazz.newInstance(), objectsJson);
-                                            socket.emit("message", jsonMessage);
-                                            terminalText.appendText(jsonMessage + "\r\n");
-                                            System.out.println(jsonMessage);
-
-                                        } catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-                                            e.printStackTrace();
-                                        }
-                                    } else {
-                                        NotConnectedJson notConnectedJson = new NotConnectedJson();
-                                        try {
-                                            socket.emit("message", notConnectedJson.errorJson(COMPANY_ID, device_id));
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
+                                            } catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+                                                e.printStackTrace();
+                                            }
+                                        } else {
+                                            NotConnectedJson notConnectedJson = new NotConnectedJson();
+                                            try {
+                                                socket.emit("message", notConnectedJson.errorJson(COMPANY_ID, DEVICE_ID));
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                     }
                                 }
