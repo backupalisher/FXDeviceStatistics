@@ -77,7 +77,7 @@ public class Controller implements Initializable {
                     System.out.println(arg);
                     terminalText.appendText(arg.toString() + "\r\n");
                     String message = (String) args[0];
-                    if (message.contains("getInfo")) {
+                    if (message.contains("status")) {
 
                         JSONParser jsonParser = new JSONParser();
                         JSONObject statusObject = null;
@@ -86,17 +86,26 @@ public class Controller implements Initializable {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
+                        JSONObject jsonObject = (JSONObject) statusObject.get("status");
+
+//                        JSONParser jsonParser = new JSONParser();
+//                        JSONObject statusObject = null;
+//                        try {
+//                            statusObject = (JSONObject) jsonParser.parse(message);
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
 //                        JSONObject jsonObject = (JSONObject) statusObject.get("status");
-//                        System.out.println(jsonObject);
+                        System.out.println(jsonObject);
 
-                        JSONObject jsonObject = statusObject;
+//                        JSONObject jsonObject = statusObject;
                         String server_init = jsonObject.get("server_init").toString();
-                        int companyId = Integer.parseInt(jsonObject.get("companyId").toString());
+                        int company_id = Integer.parseInt(jsonObject.get("company_id").toString());
 
-                        System.out.println(companyId + " = " + COMPANY_ID);
+                        System.out.println(company_id + " = " + COMPANY_ID);
 
                         if (server_init.contains("getDevices")) {
-                            if ((companyId == COMPANY_ID) || (companyId == 0)) {
+                            if ((company_id == COMPANY_ID) || (company_id == 0)) {
                                 JSONArray devices = (JSONArray) jsonObject.get("devices");
 
                                 Iterator j = devices.iterator();
