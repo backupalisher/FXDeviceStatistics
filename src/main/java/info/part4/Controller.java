@@ -30,7 +30,7 @@ public class Controller implements Initializable {
     public static int USER_ID = 3;
     public static int COMPANY_ID = 26;
     public static int DEVICE_ID = 0;
-//    public static int ADDRESS_ID = 3;
+    public static int ADDRESS_ID = 3;
 
     @FXML
     private TextArea terminalText;
