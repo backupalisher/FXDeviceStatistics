@@ -1,3 +1,2 @@
-URL_CLIENT_ENDPOINT;http://socket.api.part4.info:3000
-USER_ID;3
+URL_CLIENT_ENDPOINT;https://socket.api.part4.info:8443/put
 COMPANY_ID;26

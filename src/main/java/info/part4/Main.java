@@ -1,7 +1,7 @@
 package info.part4;
 
-//import javafx.application.Application;
-import container.remote.EmbeddedApplication;
+//import container.remote.EmbeddedApplication;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -21,7 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Timer;
 
-public class Main extends EmbeddedApplication {
+public class Main extends Application {
     private static final String iconImageLoc =
             "http://icons.iconarchive.com/icons/scafer31000/bubble-circle-3/16/GameCenter-icon.png";
 
