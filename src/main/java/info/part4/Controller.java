@@ -62,7 +62,7 @@ public class Controller implements Initializable {
                 socket.emit(EVENT_PUT, "Connect, user id: " + COMPANY_ID);
             }).on(EVENT_GET, objects -> {
                 System.out.println("Message Received: ");
-//                TermAppend(objects[0].toString());
+                TermAppend(objects[0].toString());
                 for (Object arg : objects) {
                     String message = (String) arg;
                     System.out.println(message);
@@ -125,7 +125,7 @@ public class Controller implements Initializable {
                                             TermAppend(jsonMessage.toString());
                                             System.out.println(jsonMessage.toString());
 
-                                        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | JSONException | InvocationTargetException e) {
+                                        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException | JSONException e) {
                                             e.printStackTrace();
                                         }
                                     } else {
@@ -150,12 +150,16 @@ public class Controller implements Initializable {
                     TermAppend(cmdEdit.getText());
                     cmdEdit.setText("");
                 });
-            }).on(Socket.EVENT_DISCONNECT, objects -> System.out.println("Client disconnected")).on(Socket.EVENT_CONNECT_ERROR, objects -> {
+            }).on(Socket.EVENT_DISCONNECT, objects -> {
+                System.out.println("Client disconnected");
+                TermAppend("Client disconnected");
+            }).on(Socket.EVENT_CONNECT_ERROR, objects -> {
                 Exception e = (Exception) objects[0];
                 e.printStackTrace();
             }).on(Socket.EVENT_ERROR, objects -> {
                 Exception e = (Exception) objects[0];
                 e.printStackTrace();
+//                TextArea(e.printStackTrace());
             }).on(Socket.EVENT_RECONNECT, objects -> {
                 System.out.println("Reconnecting: ");
                 for (Object arg : objects) {
