@@ -47,8 +47,6 @@ public class Controller implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        LoadSettings.settings();
-
         IO.Options opts = new IO.Options();
         opts.forceNew = true;
         opts.reconnection = true;
@@ -61,6 +59,7 @@ public class Controller implements Initializable {
                 TermAppend("Connect");
                 socket.emit(EVENT_PUT, "Connect, user id: " + COMPANY_ID);
             }).on(EVENT_GET, objects -> {
+                LoadSettings.settings();
                 System.out.println("Message Received: ");
                 TermAppend(objects[0].toString());
                 for (Object arg : objects) {
@@ -96,11 +95,11 @@ public class Controller implements Initializable {
                                 for (Object device1 : devices) {
                                     JSONObject device = (JSONObject) device1;
 
-                                    System.out.println(device.get("productName").toString());
+                                    System.out.println(device.get("productname").toString());
 
-                                    String productName = device.get("productName").toString();
+                                    String productName = device.get("productname").toString();
                                     String device_url = device.get("url").toString();
-                                    DEVICE_ID = Integer.parseInt(device.get("device_id").toString());
+                                    DEVICE_ID = Integer.parseInt(device.get("id").toString());
 
                                     PingHost pingHost = new PingHost();
                                     boolean device_online;
@@ -118,6 +117,8 @@ public class Controller implements Initializable {
                                             Object[] objectsJson = new Object[]{device_url};
                                             jsonMessage = (org.json.JSONObject) method.invoke(clazz.newInstance(), objectsJson);
 
+                                            System.out.println(jsonMessage.toString());
+
                                             jsonMessage.put("device_id", DEVICE_ID);
                                             jsonMessage.put("company_id", COMPANY_ID);
 
@@ -131,7 +132,7 @@ public class Controller implements Initializable {
                                     } else {
                                         NotConnectedJson notConnectedJson = new NotConnectedJson();
                                         try {
-                                            String notConnectDevice = notConnectedJson.errorJson(COMPANY_ID, DEVICE_ID).toString();
+                                            String notConnectDevice = notConnectedJson.errorJson(DEVICE_ID, "Нет связи с устройством").toString();
                                             socket.emit(EVENT_PUT, notConnectDevice);
                                             TermAppend(notConnectDevice);
                                             System.out.println(notConnectDevice);
