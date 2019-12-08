@@ -117,6 +117,7 @@ public class Main extends Application {
             if (!java.awt.SystemTray.isSupported()) {
                 System.out.println("No system tray support, application exiting.");
                 Platform.exit();
+                System.exit(0);
             }
 
             // set up a system tray icon.
@@ -149,6 +150,7 @@ public class Main extends Application {
                 notificationTimer.cancel();
                 Platform.exit();
                 tray.remove(trayIcon);
+                System.exit(0);
             });
 
             // setup the popup menu for the application.

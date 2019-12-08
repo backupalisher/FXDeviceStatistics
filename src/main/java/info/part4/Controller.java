@@ -1,6 +1,5 @@
 package info.part4;
 
-
 import info.part4.Utils.DynamicClassOverloader;
 import info.part4.Utils.LoadSettings;
 import info.part4.Utils.NotConnectedJson;
@@ -26,10 +25,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class Controller implements Initializable {
-    public static String URL_CLIENT_ENDPOINT = "https://socket.api.part4.info:8443/put";
+    public static String URL_CLIENT_ENDPOINT;
     //    public static int USER_ID = 3;
-    public static int COMPANY_ID = 26;
-    private static int DEVICE_ID = 0;
+    public static int COMPANY_ID;
+    private static int DEVICE_ID;
     private static final String EVENT_PUT = "put";
     private static final String EVENT_GET = "get";
 
@@ -51,9 +50,12 @@ public class Controller implements Initializable {
         opts.forceNew = true;
         opts.reconnection = true;
 
+        LoadSettings.settings();
+
         final Socket socket;
         try {
             socket = IO.socket(URL_CLIENT_ENDPOINT, opts);
+            System.out.println(URL_CLIENT_ENDPOINT);
             socket.on(Socket.EVENT_CONNECT, objects -> {
                 System.out.println("Connect");
                 TermAppend("Connect");
@@ -105,6 +107,7 @@ public class Controller implements Initializable {
                                     boolean device_online;
 //                                    device_online = true;
                                     device_online = pingHost.ping(getIP(device_url), 80, 2000);
+                                    System.out.println(device_url);
                                     if (device_online) {
                                         String name = productName.replaceAll("\\s+", "");
                                         try {
@@ -163,6 +166,7 @@ public class Controller implements Initializable {
 //                TextArea(e.printStackTrace());
             }).on(Socket.EVENT_RECONNECT, objects -> {
                 System.out.println("Reconnecting: ");
+                TermAppend("Reconnecting...");
                 for (Object arg : objects) {
                     System.out.println(arg);
                     TermAppend(arg.toString());
