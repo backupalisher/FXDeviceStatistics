@@ -120,7 +120,7 @@ public class Controller implements Initializable {
                                             Object[] objectsJson = new Object[]{device_url};
                                             jsonMessage = (org.json.JSONObject) method.invoke(clazz.newInstance(), objectsJson);
 
-                                            System.out.println(jsonMessage.toString());
+//                                            System.out.println(jsonMessage.toString());
 
                                             jsonMessage.put("device_id", DEVICE_ID);
                                             jsonMessage.put("company_id", COMPANY_ID);
