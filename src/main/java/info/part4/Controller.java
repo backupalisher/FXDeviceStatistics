@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
@@ -26,7 +27,6 @@ import org.json.simple.parser.ParseException;
 
 public class Controller implements Initializable {
     public static String URL_CLIENT_ENDPOINT;
-    //    public static int USER_ID = 3;
     public static int COMPANY_ID;
     private static int DEVICE_ID;
     private static final String EVENT_PUT = "put";
@@ -42,20 +42,17 @@ public class Controller implements Initializable {
     public Controller() {
     }
 
-
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        TermAppend("Started...");
         IO.Options opts = new IO.Options();
         opts.forceNew = true;
         opts.reconnection = true;
-
         LoadSettings.settings();
-
         final Socket socket;
         try {
             socket = IO.socket(URL_CLIENT_ENDPOINT, opts);
-            System.out.println(URL_CLIENT_ENDPOINT);
             socket.on(Socket.EVENT_CONNECT, objects -> {
                 System.out.println("Connect");
                 TermAppend("Connect");
@@ -91,7 +88,6 @@ public class Controller implements Initializable {
                                 JSONArray devices = (JSONArray) jsonObject.get("devices");
 
                                 TermAppend("get device information");
-
                                 System.out.println(jsonObject.toString());
 
                                 for (Object device1 : devices) {
@@ -105,31 +101,39 @@ public class Controller implements Initializable {
 
                                     PingHost pingHost = new PingHost();
                                     boolean device_online;
-//                                    device_online = true;
-                                    device_online = pingHost.ping(getIP(device_url), 80, 2000);
+                                    device_online = true;
+//                                    device_online = pingHost.ping(getIP(device_url), 80, 2000);
                                     System.out.println(device_url);
                                     if (device_online) {
                                         String name = productName.replaceAll("\\s+", "");
                                         try {
-                                            ClassLoader loader = new DynamicClassOverloader(new String[]{"./modules"});
-                                            Class clazz = Class.forName(name, true, loader);
+                                            File dir = new File("./modules");
+                                            File[] matches = dir.listFiles((dir1, mname) -> mname.startsWith(name) && mname.endsWith(".class"));
+                                            assert matches != null;
+                                            System.out.println(matches.length);
+                                            if (matches.length >= 1) {
+                                                ClassLoader loader = new DynamicClassOverloader(new String[]{"./modules"});
+                                                Class clazz = Class.forName(name, true, loader);
+                                                Class[] params = {String.class};
+                                                Method method = clazz.getDeclaredMethod("parser", params);
+                                                method.setAccessible(true);
+                                                Object[] objectsJson = new Object[]{device_url};
+                                                try {
+                                                    jsonMessage = (org.json.JSONObject) method.invoke(clazz.newInstance(), objectsJson);
+                                                    jsonMessage.put("device_id", DEVICE_ID);
+                                                    jsonMessage.put("company_id", COMPANY_ID);
+                                                    socket.emit(EVENT_PUT, jsonMessage.toString());
+                                                    TermAppend(jsonMessage.toString());
+                                                    System.out.println(jsonMessage.toString());
+                                                } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | InvocationTargetException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            } else {
+                                                TermAppend("Not found device model");
+                                                System.out.println("Not found device model");
+                                            }
 
-                                            Class[] params = {String.class};
-                                            Method method = clazz.getDeclaredMethod("parser", params);
-                                            method.setAccessible(true);
-                                            Object[] objectsJson = new Object[]{device_url};
-                                            jsonMessage = (org.json.JSONObject) method.invoke(clazz.newInstance(), objectsJson);
-
-//                                            System.out.println(jsonMessage.toString());
-
-                                            jsonMessage.put("device_id", DEVICE_ID);
-                                            jsonMessage.put("company_id", COMPANY_ID);
-
-                                            socket.emit(EVENT_PUT, jsonMessage.toString());
-                                            TermAppend(jsonMessage.toString());
-                                            System.out.println(jsonMessage.toString());
-
-                                        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException | JSONException e) {
+                                        } catch (ClassNotFoundException | NoSuchMethodException | JSONException e) {
                                             e.printStackTrace();
                                         }
                                     } else {
@@ -179,11 +183,15 @@ public class Controller implements Initializable {
     }
 
     private void TermAppend(String message) {
-        Date date = new Date();
-        SimpleDateFormat moment;
-        moment = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+        try {
+            Thread.sleep(20);
+            Date date = new Date();
+            String time = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date);
 
-        terminalText.appendText(moment.format(date) + " - " + message + "\r\n");
+            terminalText.appendText(time + " - " + message + "\r\n");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     //get ip address from string
